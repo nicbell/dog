@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="breed"
+            type="net.nicbell.dogbreeds.api.dog.DogBreed" />
+
+        <variable
+            name="handlers"
+            type="net.nicbell.dogbreeds.ui.dogBreedList.DogBreedListHandlers" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_ripple"
+            android:clickable="true"
+            android:drawableEnd="@drawable/ic_navigate_next_black_24dp"
+            android:focusable="true"
+            android:onClick='@{() -> handlers.onBreedClick(breed)}'
+            android:padding="@dimen/space_x4"
+            android:text="@{breed.name}"
+            android:textAppearance="?textAppearanceSubtitle1"
+            app:drawableTint="@color/colorBlack"
+            tools:lines="1"
+            tools:text="@tools:sample/lorem/random" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorDivider" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:entries="@{breed.subBreeds}"
+            app:handlers="@{handlers}"
+            app:layout="@{@layout/list_item_sub_breed}" />
+    </LinearLayout>
+</layout>

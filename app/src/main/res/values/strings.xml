@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Dog Breeds</string>
+    <string name="api_base">https://dog.ceo/api/</string>
+    <string name="btn_retry">Retry</string>
+</resources>
