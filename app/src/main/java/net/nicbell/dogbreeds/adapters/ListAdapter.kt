@@ -35,7 +35,7 @@ open class ListAdapter<T>(private val layoutId: Int, private val itemBinder: Ite
         val item = data[position]
         holder.bind(item, itemBinder)
     }
-
+    
     override fun getItemViewType(position: Int): Int {
         return layoutId
     }
