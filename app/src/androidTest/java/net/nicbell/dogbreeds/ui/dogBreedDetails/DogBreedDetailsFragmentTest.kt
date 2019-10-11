@@ -1,31 +1,25 @@
 package net.nicbell.dogbreeds.ui.dogBreedDetails
 
 import androidx.fragment.app.testing.launchFragmentInContainer
-import androidx.navigation.NavController
-import androidx.navigation.Navigation
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
-import io.mockk.verify
 import net.nicbell.dogbreeds.R
-import net.nicbell.dogbreeds.adapters.ListAdapter
 import net.nicbell.dogbreeds.api.ApiResponse
 import net.nicbell.dogbreeds.api.DogApi
-import net.nicbell.dogbreeds.api.dog.DogBreed
-import net.nicbell.dogbreeds.api.dog.DogSubBreed
-import net.nicbell.dogbreeds.ui.dogBreedList.DogBreedListFragment
+import net.nicbell.dogbreeds.ui.dogBreedDetails.RecyclerViewItemCountAssertion.Companion.withItemCount
 import org.junit.BeforeClass
 import org.junit.Test
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
 import org.koin.dsl.module
 
-
+/**
+ * Testing breed details fragment.
+ */
 class DogBreedDetailsFragmentTest {
     companion object {
         @MockK
@@ -37,6 +31,15 @@ class DogBreedDetailsFragmentTest {
             single { dogApi }
         }
 
+        private const val breed = "bulldog"
+        private const val subBreed = "french"
+        private val apiSuccess = ApiResponse(
+            listOf(
+                "https://images.unsplash.com/photo-1558015346-c000df8119a8?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=3151&q=80"
+            ), "success"
+        )
+
+
         @BeforeClass
         @JvmStatic
         fun setup() {
@@ -45,39 +48,25 @@ class DogBreedDetailsFragmentTest {
             unloadKoinModules(networkModule)
             loadKoinModules(networkModule)
 
-            // Mock API response success
-            val mockedBreeds = listOf(
-                DogBreed("boxer", listOf()),
-                DogBreed(
-                    "bulldog", listOf(
-                        DogSubBreed("bulldog", "boston"),
-                        DogSubBreed("bulldog", "english")
-                    )
-                )
-            )
-            coEvery { dogApi.getDogBreeds() } returns ApiResponse(mockedBreeds, "success")
+            // Use our fake data
+            coEvery { dogApi.getDogBreedImages(breed, subBreed) } returns apiSuccess
         }
     }
 
+    /**
+     * Test images loaded into recycler
+     */
     @Test
-    fun navigationToDetails() {
-        // Create a mock NavController
-        val mockNavController = mockk<NavController>(relaxed = true) {}
-
+    fun showImages() {
         // Create DogBreedListFragment
-        val dogBreedList = launchFragmentInContainer<DogBreedListFragment>()
+        val args = DogBreedDetailsFragmentArgs.Builder(breed, subBreed).build().toBundle()
+        launchFragmentInContainer<DogBreedDetailsFragment>(args)
 
-        dogBreedList.onFragment { fragment ->
-            Navigation.setViewNavController(fragment.requireView(), mockNavController)
+        // Verify API is called
+        coVerify {
+            dogApi.getDogBreedImages(breed, subBreed)
         }
 
-        // Click list item
-        onView(withId(R.id.recyclerBreeds))
-            .perform(actionOnItemAtPosition<ListAdapter.ViewHolder<DogBreed>>(0, click()))
-
-        // Verify that performing a click prompts the correct navigation action
-        verify {
-            mockNavController.navigate(R.id.action_dogBreedListFragment_to_dogBreedDetailsFragment, any())
-        }
+        onView(withId(R.id.recyclerImages)).check(withItemCount(apiSuccess.message.size))
     }
 }

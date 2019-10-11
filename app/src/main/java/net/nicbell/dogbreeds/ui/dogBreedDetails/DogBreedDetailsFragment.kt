@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.Snackbar
 import net.nicbell.dogbreeds.BR
@@ -16,12 +15,13 @@ import net.nicbell.dogbreeds.adapters.ListAdapter
 import net.nicbell.dogbreeds.databinding.FragmentDogBreedDetailsBinding
 import net.nicbell.dogbreeds.ui.FragmentExtensions.observe
 import net.nicbell.dogbreeds.ui.FragmentExtensions.observeEvent
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 /**
  * Fragment displaying a list of dog images.
  */
 class DogBreedDetailsFragment : Fragment() {
-    private val viewModel: DogBreedDetailsViewModel by activityViewModels()
+    private val viewModel: DogBreedDetailsViewModel by sharedViewModel()
     private val args: DogBreedDetailsFragmentArgs by navArgs()
 
     private lateinit var binding: FragmentDogBreedDetailsBinding
