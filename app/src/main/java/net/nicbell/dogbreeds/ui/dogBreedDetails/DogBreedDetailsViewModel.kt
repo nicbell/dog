@@ -8,15 +8,11 @@ import kotlinx.coroutines.launch
 import net.nicbell.dogbreeds.api.DogApi
 import net.nicbell.dogbreeds.viewModel.Event
 import net.nicbell.dogbreeds.viewModel.ViewModelExtensions.handleApiCall
-import org.koin.core.KoinComponent
-import org.koin.core.inject
 
 /**
  * Dog breed details view model.
  */
-class DogBreedDetailsViewModel : ViewModel(), KoinComponent {
-
-    private val dogApi: DogApi by inject()
+class DogBreedDetailsViewModel(private val dogApi: DogApi) : ViewModel() {
 
     // Live data, don't expose, mutable live data to the view
     // unless it's a form field :P

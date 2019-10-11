@@ -9,9 +9,6 @@ import net.nicbell.dogbreeds.MainCoroutineRule
 import net.nicbell.dogbreeds.api.ApiResponse
 import net.nicbell.dogbreeds.api.DogApi
 import org.junit.*
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
-import org.koin.dsl.module
 
 
 class DogBreedDetailsViewModelTest {
@@ -19,27 +16,11 @@ class DogBreedDetailsViewModelTest {
         @MockK
         private lateinit var dogApi: DogApi
 
-        // Use a module with our mocked API for koin because our view model gets
-        // API instance via DI
-        private val networkModule = module {
-            single { dogApi }
-        }
-
         @BeforeClass
         @JvmStatic
         fun setup() {
             // things to execute once and keep around for the class
             MockKAnnotations.init(this)
-
-            startKoin {
-                modules(networkModule)
-            }
-        }
-
-        @AfterClass
-        @JvmStatic
-        fun after() {
-            stopKoin()
         }
     }
 
@@ -60,7 +41,7 @@ class DogBreedDetailsViewModelTest {
     @Before
     fun setUp() {
         // Start with a fresh view model each test
-        viewModel = DogBreedDetailsViewModel()
+        viewModel = DogBreedDetailsViewModel(dogApi)
     }
 
     @Test

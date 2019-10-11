@@ -12,10 +12,6 @@ import net.nicbell.dogbreeds.api.dog.DogBreed
 import net.nicbell.dogbreeds.api.dog.DogSubBreed
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.*
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
-import org.koin.dsl.module
-import org.koin.test.KoinTest
 import retrofit2.HttpException
 import retrofit2.Response
 import java.io.IOException
@@ -24,32 +20,16 @@ import java.io.IOException
  * Just mocking various API responses and seeing if the live data
  * which would be available to the view is as expected.
  */
-class DogBreedListViewModelTest : KoinTest {
+class DogBreedListViewModelTest  {
     companion object {
         @MockK
         private lateinit var dogApi: DogApi
-
-        // Use a module with our mocked API for koin because our view model gets
-        // API instance via DI
-        private val networkModule = module {
-            single { dogApi }
-        }
 
         @BeforeClass
         @JvmStatic
         fun setup() {
             // things to execute once and keep around for the class
             MockKAnnotations.init(this)
-
-            startKoin {
-                modules(networkModule)
-            }
-        }
-
-        @AfterClass
-        @JvmStatic
-        fun after() {
-            stopKoin()
         }
     }
 
@@ -71,7 +51,7 @@ class DogBreedListViewModelTest : KoinTest {
     @Before
     fun setUp() {
         // Start with a fresh view model each test
-        viewModel = DogBreedListViewModel()
+        viewModel = DogBreedListViewModel(dogApi)
     }
 
     @Test

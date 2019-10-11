@@ -10,15 +10,11 @@ import net.nicbell.dogbreeds.api.dog.DogBreed
 import net.nicbell.dogbreeds.api.dog.DogSubBreed
 import net.nicbell.dogbreeds.viewModel.Event
 import net.nicbell.dogbreeds.viewModel.ViewModelExtensions.handleApiCall
-import org.koin.core.KoinComponent
-import org.koin.core.inject
 
 /**
  * Dog breed list view model.
  */
-class DogBreedListViewModel : ViewModel(), KoinComponent, DogBreedListHandlers {
-
-    private val dogApi: DogApi by inject()
+class DogBreedListViewModel(private val dogApi: DogApi) : ViewModel(), DogBreedListHandlers {
 
     // Live data, don't expose, mutable live data to the view
     // unless it's a form field :P
