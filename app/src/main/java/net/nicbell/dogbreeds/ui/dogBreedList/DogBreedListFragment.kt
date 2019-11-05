@@ -8,15 +8,18 @@ import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
+import io.uniflow.android.flow.onEvents
+import io.uniflow.android.flow.onStates
+import io.uniflow.core.flow.UIEvent
+import io.uniflow.core.flow.UIState
 import net.nicbell.dogbreeds.BR
 import net.nicbell.dogbreeds.R
 import net.nicbell.dogbreeds.adapters.ListAdapter
 import net.nicbell.dogbreeds.api.dog.DogBreed
 import net.nicbell.dogbreeds.databinding.FragmentDogBreedListBinding
-import net.nicbell.dogbreeds.ui.FragmentExtensions.observe
-import net.nicbell.dogbreeds.ui.FragmentExtensions.observeEvent
 import net.nicbell.dogbreeds.ui.dogBreedDetails.DogBreedDetailsFragmentArgs
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+
 
 /**
  * Fragment displaying a list of dog breeds / sub breeds
@@ -37,43 +40,76 @@ class DogBreedListFragment : Fragment() {
         // Title
         activity?.setTitle(R.string.app_name)
 
+        binding.item.title = "Hello From the View"
+
         initRecycler()
 
         // Load breeds
-        viewModel.loadDogBreeds()
+        viewModel.loadDogBreedsFlow()
 
         return binding.root
     }
 
     private fun observeViewModel() {
-        observeEvent(viewModel.error) { error ->
-            error?.run {
-                val snackbar = Snackbar.make(binding.layCoordinator, this, Snackbar.LENGTH_INDEFINITE)
-                snackbar.setAction(R.string.btn_retry) {
-                    snackbar.dismiss()
-                    viewModel.loadDogBreeds()
+        onStates(viewModel) {
+            when (it) {
+                is UIState.Loading -> {
+                    binding.recyclerBreeds.visibility = View.GONE
+                    binding.progressBar.visibility = View.VISIBLE
                 }
-                snackbar.show()
+                is UIState.Empty,
+                is UIState.Failed -> {
+                    binding.recyclerBreeds.visibility = View.VISIBLE
+                    binding.progressBar.visibility = View.GONE
+                }
+                is DogBreedListState.LoadedDogBreeds -> {
+                    binding.recyclerBreeds.visibility = View.VISIBLE
+                    binding.progressBar.visibility = View.GONE
+                    breedAdapter.update(it.breeds)
+                }
             }
         }
 
-        observeEvent(viewModel.selectBreedCommand) { breed ->
-            breed?.let {
-                val args = DogBreedDetailsFragmentArgs.Builder(it.breed, null).build().toBundle()
-                findNavController().navigate(R.id.action_dogBreedListFragment_to_dogBreedDetailsFragment, args)
+        onEvents(viewModel) { event ->
+            when (val data = event.take()) {
+                is UIEvent.Fail -> {
+                    data.message?.let { showError(it) }
+                }
+                is DogBreedListEvent.NavigateToBreed -> {
+                    val args = DogBreedDetailsFragmentArgs.Builder(data.breed.breed, null).build().toBundle()
+                    findNavController().navigate(R.id.action_dogBreedListFragment_to_dogBreedDetailsFragment, args)
+                }
+                is DogBreedListEvent.NavigateToSubBreed -> {
+                    val args = DogBreedDetailsFragmentArgs.Builder(data.subBreed.breed, data.subBreed.subBreed).build()
+                        .toBundle()
+                    findNavController().navigate(R.id.action_dogBreedListFragment_to_dogBreedDetailsFragment, args)
+                }
             }
         }
 
-        observeEvent(viewModel.selectSubBreedCommand) { subBreed ->
-            subBreed?.let {
-                val args = DogBreedDetailsFragmentArgs.Builder(it.breed, it.subBreed).build().toBundle()
-                findNavController().navigate(R.id.action_dogBreedListFragment_to_dogBreedDetailsFragment, args)
-            }
-        }
-
-        observe(viewModel.dogBreeds) { breeds ->
-            breeds?.let { breedAdapter.update(breeds) }
-        }
+//        observeEvent(viewModel.error) { error ->
+//            error?.run {
+//                showError(this)
+//            }
+//        }
+//
+//        observeEvent(viewModel.selectBreedCommand) { breed ->
+//            breed?.let {
+//                val args = DogBreedDetailsFragmentArgs.Builder(it.breed, null).build().toBundle()
+//                findNavController().navigate(R.id.action_dogBreedListFragment_to_dogBreedDetailsFragment, args)
+//            }
+//        }
+//
+//        observeEvent(viewModel.selectSubBreedCommand) { subBreed ->
+//            subBreed?.let {
+//                val args = DogBreedDetailsFragmentArgs.Builder(it.breed, it.subBreed).build().toBundle()
+//                findNavController().navigate(R.id.action_dogBreedListFragment_to_dogBreedDetailsFragment, args)
+//            }
+//        }
+//
+//        observe(viewModel.dogBreeds) { breeds ->
+//            breeds?.let { breedAdapter.update(breeds) }
+//        }
     }
 
     private fun initRecycler() {
@@ -87,5 +123,14 @@ class DogBreedListFragment : Fragment() {
         breedAdapter = ListAdapter(R.layout.list_item_breed, itemBinder)
         binding.recyclerBreeds.setHasFixedSize(true)
         binding.recyclerBreeds.adapter = breedAdapter
+    }
+
+    private fun showError(message: String) {
+        val snackbar = Snackbar.make(binding.layCoordinator, message, Snackbar.LENGTH_INDEFINITE)
+        snackbar.setAction(R.string.btn_retry) {
+            snackbar.dismiss()
+            viewModel.loadDogBreedsFlow()
+        }
+        snackbar.show()
     }
 }
