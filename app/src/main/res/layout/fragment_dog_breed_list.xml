@@ -21,23 +21,30 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerBreeds"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:itemCount="10"
-                tools:listitem="@layout/list_item_breed" />
-
             <net.nicbell.dogbreeds.ui.ListItem
                 android:id="@+id/item"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="120dp"
+                android:layout_alignParentTop="true"
+                app:subTitle="Subsub">
 
-            <TextView
-                android:id="@+id/sss"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/checky"
+                    android:text="Hello" />
+
+            </net.nicbell.dogbreeds.ui.ListItem>
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerBreeds"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/item"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:itemCount="10"
+                tools:listitem="@layout/list_item_breed" />
         </RelativeLayout>
 
         <androidx.core.widget.ContentLoadingProgressBar

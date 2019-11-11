@@ -2,10 +2,14 @@ package net.nicbell.dogbreeds.ui
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.View
+import android.view.ViewGroup
+import androidx.appcompat.widget.AppCompatCheckBox
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.BindingMethod
 import androidx.databinding.BindingMethods
 import com.google.android.material.textview.MaterialTextView
+import kotlinx.android.synthetic.main.list_item.view.*
 import net.nicbell.dogbreeds.R
 
 
@@ -49,5 +53,16 @@ class ListItem @JvmOverloads constructor(
 
     fun setOnTitleClick(listener: OnClickListener) {
         txtTitle.setOnClickListener(listener)
+    }
+
+
+    //Adding views
+    override fun addView(child: View, index: Int, params: ViewGroup.LayoutParams) {
+        if (child is AppCompatCheckBox) {
+            removeView(layFrame)
+            super.addView(child, index, layFrame.layoutParams)
+        } else {
+            super.addView(child, index, params)
+        }
     }
 }

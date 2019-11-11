@@ -12,6 +12,7 @@ import io.uniflow.android.flow.onEvents
 import io.uniflow.android.flow.onStates
 import io.uniflow.core.flow.UIEvent
 import io.uniflow.core.flow.UIState
+import kotlinx.android.synthetic.main.fragment_dog_breed_list.view.*
 import net.nicbell.dogbreeds.BR
 import net.nicbell.dogbreeds.R
 import net.nicbell.dogbreeds.adapters.ListAdapter
@@ -41,6 +42,7 @@ class DogBreedListFragment : Fragment() {
         activity?.setTitle(R.string.app_name)
 
         binding.item.title = "Hello From the View"
+        binding.item.checky.isChecked = true
 
         initRecycler()
 
